@@ -1,6 +1,18 @@
 ---
 name: youtube-colab-oauth
+description: "YouTube OAuth from Google Colab (Full Scope Access)"
+version: 1.0.0
+author: Alpesh Makwana
+license: MIT
+platforms: [linux]
+---
+
+name: youtube-colab-oauth
 description: Use when setting up YouTube full-scope OAuth via Colab.
+version: 1.0.0
+author: Alpesh Makwana
+license: MIT
+platforms: [linux, macos]
 ---
 
 # YouTube OAuth from Google Colab (Full Scope Access)

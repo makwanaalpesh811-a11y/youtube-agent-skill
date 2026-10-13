@@ -1,6 +1,18 @@
 ---
 name: youtube-full-access
+description: "YouTube Full Access — Alpesh's Channel"
+version: 1.0.0
+author: Alpesh Makwana
+license: MIT
+platforms: [linux]
+---
+
+name: youtube-full-access
 description: Use for YouTube video upload, delete, and channel work.
+version: 1.0.0
+author: Alpesh Makwana
+license: MIT
+platforms: [linux, macos]
 ---
 
 # YouTube Full Access — Alpesh's Channel

@@ -1,6 +1,18 @@
 ---
 name: youtube-content-pipeline
+description: "YouTube Content Pipeline — Download, Re-upload, Copyright Test"
+version: 1.0.0
+author: Alpesh Makwana
+license: MIT
+platforms: [linux]
+---
+
+name: youtube-content-pipeline
 description: YouTube download, batch upload, and copyright tests.
+version: 1.0.0
+author: Alpesh Makwana
+license: MIT
+platforms: [linux, macos]
 ---
 
 # YouTube Content Pipeline — Download, Re-upload, Copyright Test
