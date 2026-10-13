@@ -1,0 +1,89 @@
+name: Skill Audit
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  skill-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate SKILL.md YAML frontmatter
+        run: |
+          pip install pyyaml -q
+          python3 -c "
+          import os, re, yaml, sys
+          errors = []
+          required = {'name','description'}
+          for root, dirs, files in os.walk('.'):
+            if '.git' in root: continue
+            if 'SKILL.md' in files:
+              fp = os.path.join(root, 'SKILL.md')
+              with open(fp) as f: content = f.read()
+              m = re.match(r'^---\s*\n(.*?)\n---', content, re.DOTALL)
+              if not m:
+                errors.append(f'{fp}: no frontmatter')
+                continue
+              try:
+                fm = yaml.safe_load(m.group(1))
+                missing = required - set(fm.keys())
+                if missing:
+                  errors.append(f'{fp}: missing {missing}')
+              except Exception as e:
+                errors.append(f'{fp}: YAML error: {e}')
+          if errors:
+            print('\n'.join(errors))
+            sys.exit(1)
+          print('All SKILL.md files valid')
+          "
+      - name: Check for secrets
+        uses: gitleaks/gitleaks-action@v2
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  python-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile all .py files
+        run: |
+          find . -name '*.py' -not -path './.git/*' -exec python3 -m py_compile {} \;
+
+  markdown-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check local markdown links
+        run: |
+          python3 -c "
+          import os, re, sys
+          errors = []
+          for root, dirs, files in os.walk('.'):
+            dirs[:] = [d for d in dirs if d != '.git']
+            for f in files:
+              if not f.endswith('.md'): continue
+              fp = os.path.join(root, f)
+              with open(fp) as fh: content = fh.read()
+              for text, link in re.findall(r'\[([^\]]+)\]\(([^)]+)\)', content):
+                if link.startswith(('http','https','mailto','#')): continue
+                lp = link.split('#')[0]
+                if not lp: continue
+                resolved = os.path.normpath(os.path.join(root, lp))
+                if not os.path.exists(resolved):
+                  errors.append(f'{fp}: broken link [{text}]({link})')
+          if errors:
+            print('\n'.join(errors))
+            sys.exit(1)
+          print('All local links OK')
+          "

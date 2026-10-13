@@ -1,79 +1,78 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.egg
-*.egg-info/
-dist/
-build/
-
-# Virtual envs
-venv/
-.venv/
-env/
-.env/
-
-# Secrets & credentials - NEVER commit these
+# Secrets - NEVER commit
 .env
 .env.*
 *.env
-*.pem
+!*.env.example
+*.token
 *.key
+*.pem
 *.p12
-*.pfx
-*.crt
-*.cert
+id_rsa*
+*credentials*
 
-# Secrets files (by pattern)
-*token*
-*secret*
-*credential*
-*api-key*
-*apikey*
+# API tokens
+*_token.json
+*_token
+gh_token*
 
-# Hermes runtime
-.hermes/
-.cache/
-.hermes-agent/
-
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Large files
-*.mp4
-*.mov
-*.avi
-*.mkv
-*.wav
-*.mp3
-*.flac
-*.zip
-*.tar.gz
-*.7z
-
-# Databases
-*.db
-*.sqlite
-*.sqlite3
-
-# Logs
-*.log
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
 
 # Node
 node_modules/
 npm-debug.log*
 yarn-error.log*
 
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
 # Termux
-termux-*.log
+*.apk
+*.aab
+__termux__*
+
+# Large data
+*.csv
+*.parquet
+*.db
+*.sqlite
+*.sqlite3
+!examples/*.csv
+
+# Archives
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+
+# Local logs
+*.log
+logs/
+
+# Local test artifacts
+.coverage
+.htmlcov/
+.pytest_cache/
+.tox/
+.mypy_cache/
+.ruff_cache/
