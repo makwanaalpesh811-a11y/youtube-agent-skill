@@ -1,0 +1,79 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual envs
+venv/
+.venv/
+env/
+.env/
+
+# Secrets & credentials - NEVER commit these
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cert
+
+# Secrets files (by pattern)
+*token*
+*secret*
+*credential*
+*api-key*
+*apikey*
+
+# Hermes runtime
+.hermes/
+.cache/
+.hermes-agent/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Large files
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wav
+*.mp3
+*.flac
+*.zip
+*.tar.gz
+*.7z
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Termux
+termux-*.log
