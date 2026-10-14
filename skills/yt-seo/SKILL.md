@@ -1,6 +1,6 @@
 ---
 name: yt-seo
-description: YouTube SEO audit: title, tags, keywords, metadata.
+description: "YouTube SEO audit: title, tags, keywords, metadata."
 version: 1.0.0
 author: Jake Schincariol (Jakeschincariol), Hermes Agent
 license: MIT

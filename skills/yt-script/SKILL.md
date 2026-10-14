@@ -1,6 +1,6 @@
 ---
 name: yt-script
-description: Write YouTube script: 21 hook formulas, scored hook.
+description: "Write YouTube script: 21 hook formulas, scored hook."
 version: 1.0.0
 author: Jake Schincariol (Jakeschincariol), Hermes Agent
 license: MIT

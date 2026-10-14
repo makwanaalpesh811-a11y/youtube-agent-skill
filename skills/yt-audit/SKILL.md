@@ -1,6 +1,6 @@
 ---
 name: yt-audit
-description: Audit YouTube channel: gaps, uploads, engagement health.
+description: "Audit YouTube channel: gaps, uploads, engagement health."
 version: 1.0.0
 author: Jake Schincariol (Jakeschincariol), Hermes Agent
 license: MIT
