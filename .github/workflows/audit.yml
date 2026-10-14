@@ -69,12 +69,17 @@ jobs:
           python3 -c "
           import os, re, sys
           errors = []
+          code_fence_re = re.compile(r'\`\`\`.*?\`\`\`', re.DOTALL)
+          inline_code_re = re.compile(r'\`[^\`]*\`')
           for root, dirs, files in os.walk('.'):
             dirs[:] = [d for d in dirs if d != '.git']
             for f in files:
               if not f.endswith('.md'): continue
               fp = os.path.join(root, f)
               with open(fp) as fh: content = fh.read()
+              # Strip code fences and inline code
+              content = code_fence_re.sub('', content)
+              content = inline_code_re.sub('', content)
               for text, link in re.findall(r'\[([^\]]+)\]\(([^)]+)\)', content):
                 if link.startswith(('http','https','mailto','#')): continue
                 lp = link.split('#')[0]
