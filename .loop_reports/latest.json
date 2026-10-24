@@ -1,0 +1,10 @@
+{
+  "run_at": "2026-10-24 03:43 UTC",
+  "files_scanned": 15,
+  "files_fixed": 0,
+  "issues_count": 2,
+  "top_issues": [
+    "./README.md: broken link /LICENSE",
+    "./skills/yt-viral/SKILL.md: broken link ./yt-script/hooks.json"
+  ]
+}
