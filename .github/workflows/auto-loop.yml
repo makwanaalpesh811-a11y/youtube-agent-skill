@@ -1,0 +1,117 @@
+name: Daily Auto-Loop
+
+# Runs every 4 hours to keep GitHub activity green
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  auto-loop:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install tools
+        run: pip install pyyaml -q
+
+      - name: Run daily scan + auto-fix
+        run: |
+          python3 - << 'PYEOF'
+          import os, re, yaml, json
+          from datetime import datetime, timezone
+
+          issues = []
+          fixed = []
+          now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+          stats = {"files_scanned": 0, "files_fixed": 0, "issues_found": 0}
+
+          for root, dirs, files in os.walk('.'):
+              if '.git' in root: continue
+              if 'SKILL.md' in files:
+                  stats["files_scanned"] += 1
+                  fp = os.path.join(root, 'SKILL.md')
+                  with open(fp) as f:
+                      content = f.read()
+                  m = re.match(r'^---\s*\n(.*?)\n---', content, re.DOTALL)
+                  if not m:
+                      issues.append(f"{fp}: no frontmatter")
+                      continue
+                  try:
+                      fm = yaml.safe_load(m.group(1))
+                  except Exception as e:
+                      issues.append(f"{fp}: YAML parse error: {e}")
+                      continue
+                  for field in ['name', 'description']:
+                      if field not in fm:
+                          issues.append(f"{fp}: missing '{field}'")
+                  if 'description' in fm:
+                      raw_line = re.search(r'^description:\s*(.+?)\s*$', content, re.MULTILINE)
+                      if raw_line:
+                          raw_desc = raw_line.group(1).strip()
+                          if ':' in raw_desc and not (raw_desc.startswith('"') or raw_desc.startswith("'")):
+                              new_desc = 'description: "' + raw_desc + '"'
+                              new_content = content.replace(raw_line.group(0), new_desc, 1)
+                              with open(fp, 'w') as f:
+                                  f.write(new_content)
+                              fixed.append(f"{fp}: quoted description")
+                              stats["files_fixed"] += 1
+
+          for root, dirs, files in os.walk('.'):
+              if '.git' in root: continue
+              for fn in files:
+                  if not fn.endswith('.md'): continue
+                  fp = os.path.join(root, fn)
+                  with open(fp) as f:
+                      content = f.read()
+                  content_clean = re.sub(r'```.*?```', '', content, flags=re.DOTALL)
+                  for link in re.findall(r'\]\(\.?([^)\s]+)\)', content_clean):
+                      if link.startswith(('http://', 'https://', 'mailto:')): continue
+                      if '#' in link: continue
+                      link_path = os.path.normpath(os.path.join(os.path.dirname(fp), link))
+                      if not os.path.exists(link_path):
+                          issues.append(f"{fp}: broken link {link}")
+
+          os.makedirs('.loop_reports', exist_ok=True)
+          nl = chr(10)
+          issues_text = nl.join('- ' + i for i in issues[:20]) if issues else '- None!'
+          fixed_text = nl.join('- ' + f for f in fixed[:20]) if fixed else '- None needed'
+          report = "# Daily Auto-Loop Report\n\n"
+          report += "**Run:** " + now + "\n"
+          report += "**Skill files scanned:** " + str(stats['files_scanned']) + "\n"
+          report += "**Auto-fixes applied:** " + str(stats['files_fixed']) + "\n"
+          report += "**Issues found:** " + str(len(issues)) + "\n\n"
+          report += "## Issues (top 20)\n" + issues_text + "\n\n"
+          report += "## Auto-fixes\n" + fixed_text + "\n"
+          with open('.loop_reports/latest.md', 'w') as f:
+              f.write(report)
+          with open('.loop_reports/latest.json', 'w') as f:
+              json.dump({"run_at": now, "files_scanned": stats["files_scanned"], "files_fixed": stats["files_fixed"], "issues_count": len(issues), "top_issues": issues[:5]}, f, indent=2)
+          print("Scanned: %d, Fixed: %d, Issues: %d" % (stats['files_scanned'], stats['files_fixed'], len(issues)))
+          PYEOF
+
+      - name: Commit changes
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          files=$(git diff --cached --name-only | wc -l)
+          git commit -m "auto-loop: daily scan (checked ${files} files)" \
+                     -m "Report: .loop_reports/latest.json"
+          git push origin HEAD
